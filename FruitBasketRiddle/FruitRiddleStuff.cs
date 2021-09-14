@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FruitBasketRiddle
 {
@@ -27,6 +29,7 @@ namespace FruitBasketRiddle
             Basket2 = basket2;
             Basket3 = basket3;
         }
+
         public FruitOptions Basket1 { get; }
         public FruitOptions Basket2 { get; }
         public FruitOptions Basket3 { get; }
@@ -37,15 +40,48 @@ namespace FruitBasketRiddle
     /// </summary>
     public class DataSet
     {
+        /// <summary>
+        /// You are welcome to create your own DataSet if you don't like static.
+        /// </summary>
+        /// <param name="basket1"></param>
+        /// <param name="basket2"></param>
+        /// <param name="basket3"></param>
+        /// <exception cref="InvalidDataSetException"></exception>
+        public DataSet(Basket basket1, Basket basket2, Basket basket3)
+        {
+            // Ensure no two baskets are equal
+            if (basket1.Equals(basket2) || basket2.Equals(basket3) || basket1.Equals(basket3))
+                throw new InvalidDataSetException(basket1, basket2, basket3);
+
+            Basket1 = basket1;
+            Basket2 = basket2;
+            Basket3 = basket3;
+        }
+
         public Basket Basket1 { get; }
         public Basket Basket2 { get; }
         public Basket Basket3 { get; }
 
-        public static DataSet[] Generate()
+        /// <summary>
+        /// Given dataset is small, I decided to hardcode all possiblities.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<DataSet> DataSets => new DataSet[]
         {
-            return new DataSet[]
-            {
-            }
+            new (
+                new Basket(FruitOptions.Apple, FruitOptions.Orange), // Basket1
+                new Basket(FruitOptions.Apple, FruitOptions.Orange), // Basket2
+                new Basket(FruitOptions.Apple, FruitOptions.Orange)  // Basket3
+            )
+        };
+    }
+
+    internal class InvalidDataSetException : Exception
+    {
+        public InvalidDataSetException(Basket basket1, Basket basket2, Basket basket3) :
+            base($"We have a violation in dataset, not all are equal: {basket1}, {basket2}")
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -78,7 +114,7 @@ namespace FruitBasketRiddle
         /// <returns></returns>
         public bool TestAnswer(FruitOptions testValue)
         {
-            return testValue == Content.Value;
+            return testValue == Content;
         }
 
         /// <summary>
@@ -88,7 +124,7 @@ namespace FruitBasketRiddle
         /// <returns></returns>
         public bool Equals(Basket other)
         {
-            return other.TestAnswer(Content);
+            return other != null && other.TestAnswer(Content);
         }
 
         /// <summary>
@@ -96,16 +132,16 @@ namespace FruitBasketRiddle
         /// </summary>
         /// <returns></returns>
         public FruitOptions RevealContent() => Content;
-    }
 
-    public struct Fruit
-    {
-        public Fruit(FruitOptions options)
+        public override bool Equals(object obj)
         {
-            Value = options;
+            return Equals(obj as Basket);
         }
 
-        public FruitOptions Value { get; init; }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine((int) Content, (int) Label);
+        }
     }
 
     public enum FruitOptions

@@ -14,5 +14,31 @@ How will you do that ?
 |  🍎  Mix 🍊  	|  🍎 Apple 	| 🍊 Orange   	|
 
 
+Below is my BDD Approach before solving the issue
+```C#
+// Arrange: Create all possible combination to test our function
+DataSet[] datasets = DataSet.Generate();
+
+foreach (DataSet dataset in datasets)
+{
+    // Act A: Take item from a basket and ask function to provide a prediction
+    FruitOptions fruit = dataset.Basket1.RevealContent();
+    
+    // Act B: Create a prediction based on the basket content
+    CalculatedContent calculatedContent = BasketService.ProcessTakeItem(fruit);
+    
+    // Assert : Our calculated content must have correct value for all baskets
+    Assert.True( dataset.Basket1.TestAnswer(calculatedContent.Basket1) );
+    Assert.True( dataset.Basket1.TestAnswer(calculatedContent.Basket2) );
+    Assert.True( dataset.Basket1.TestAnswer(calculatedContent.Basket3) );
+}
+```
+
+
+Solution to solve the riddle:
+```C#
+BasketService.ProcessTakeItem(fruit);
+```
+
 You are here, maybe because you have an interview question,
 buy me a coffee if you like this.

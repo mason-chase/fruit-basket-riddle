@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Xunit;
 
 namespace FruitBasketRiddle
@@ -16,7 +18,7 @@ namespace FruitBasketRiddle
             // +--------+--------+--------+
             // |   Mix  |  Apple | Orange | 
             // +--------+--------+--------+
-            DataSet[] datasets = DataSet.Generate();
+            IEnumerable<DataSet> datasets = DataSet.DataSets;
             
             foreach (DataSet dataset in datasets)
             {
@@ -36,10 +38,23 @@ namespace FruitBasketRiddle
         // Ensure our basket constructor follows rules of the game,
         // It is invalid to arrange a basket with  During 
         [Fact]
-        public void TestFail()
+        public void BasketWithCorrectLabel()
         {
             Assert.Throws<InvalidLabelException>(() => new Basket(FruitOptions.Apple, FruitOptions.Apple));
-            
         }
+        
+        #region Test Coverage (Ensure everything is in compliance)
+
+        [Fact]
+        public void DataSetWithDuplicateValues()
+        {
+            Assert.Throws<InvalidDataSetException>(() => new DataSet(
+                    new Basket(FruitOptions.Apple, FruitOptions.Orange),
+                    new Basket(FruitOptions.Apple, FruitOptions.Mixed),
+                    new Basket(FruitOptions.Orange, FruitOptions.Mixed)
+                ) 
+            );
+        }
+        #endregion
     }
 }
